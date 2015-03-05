@@ -1,10 +1,10 @@
 #!/usr/bin/env python
+from __future__ import division
 import argparse # optparse is deprecated
 import math
 from itertools import islice # slicing for iterators
 
-def word_matches(h, ref):
-    return sum(1 for w in h if w in ref)
+#### BLEU CODE
 
 def ngram_calc(h, ref, val):
     num_grams           = len(ref) - val + 1
@@ -40,8 +40,6 @@ def ngram_in(ref, h):
             return 1
     return 0
 
-
-
 def bleu_calc(h, ref):
 
     # calculating brevity penalty
@@ -60,13 +58,9 @@ def bleu_calc(h, ref):
         if p > 0.0:
             ret_val = ret_val + weight * math.log(p)
 
-    print ret_val
+    # print ret_val
     # print bp
     # print math.fabs(bp * ret_val)
-
-    ret_val = pow(math.e, ret_val)
-
-    print ret_val
 
     return math.fabs(bp * ret_val)
 
@@ -77,6 +71,85 @@ def brevity_penalty(h, ref):
     else:
         ret_val = pow(math.e, (1.0 - len(ref)/len(h)))
     return ret_val
+
+#### METEOR CODE
+
+# initializing tunable variables
+a = .55
+b = .9
+l = .05
+
+# creating a length function for iterators
+def len_iterable(i):
+    return sum(1 for _ in i)
+
+# calculate precision
+def precision(h, ref):
+    if word_matches(h, ref) != 0:
+        return (word_matches(h, ref) / len(h))
+    else:
+        return 0.0;
+
+# calculate recall
+def recall(h, ref):
+    if word_matches(h, ref) != 0:
+        return (word_matches(h, ref) / len(ref))
+    else:
+        return 0.0
+
+# calcualtes the penalty
+def penalty (h, ref):
+
+    # print pow((chunks(h, ref) / word_matches(h, ref)), b)
+    if word_matches(h, ref) != 0:
+        return (1 - l * pow((chunks(h, ref) / word_matches(h, ref)), b))
+    else:
+        return 0.0
+
+def chunks (h, ref):
+    # initializing variables
+    num_chunks      = 0.0
+    length          = 0.0
+    pos             = 0
+    chunk_started   = 0.0
+
+    # list converation
+    h_list = list(h)
+    ref_list = list(ref)
+
+    if len(h) < len(ref):
+        length = len(h)
+    else:
+        length = len(ref)
+
+    if word_matches(h, ref) == len(ref) == len(h):
+        num_chunks = len(ref)
+        return num_chunks
+
+    while length > pos:
+        if ref_list[pos] == h_list[pos]:
+            if chunk_started == 0:
+                chunk_started = 1
+        else:
+            if chunk_started:
+                num_chunks = num_chunks + 1.0
+
+        # incrementing the position
+        pos = pos + 1
+
+    # returning the number of chunks
+    return num_chunks
+
+# calculates the METEOR value of the reference and translation
+def meteor_calc(h, ref):
+    if recall(h, ref) == penalty(h, ref) == 0.0:
+        return 0.0
+    else:
+        return (penalty(h, ref) * ((precision(h, ref) * recall(h, ref)) / ((1.0 - a) * (precision(h, ref) + recall(h, ref)))))
+
+# calculates the number of word matches between the reference and translation
+def word_matches(h, ref):
+    return sum(1 for w in h if w in ref)
 
 def main():
     parser = argparse.ArgumentParser(description='Evaluate translation hypotheses.')
@@ -100,7 +173,6 @@ def main():
         lower_h1    = []
         lower_h2    = []
         lower_ref   = []
-        rset        = set()
         for w in h1:
             lower_h1.append(w.lower())
         for s in h2:
@@ -108,14 +180,21 @@ def main():
         for t in ref:
             lower_ref.append(t.lower())
 
-        # print lower_ref
+        rset = set(lower_ref)
 
         # calculating meteor values
+        l_h1 = meteor_calc(lower_h1, rset)
+        l_h2 = meteor_calc(lower_h2, rset)
+
+        # calculating bleu values
         b_h1 = bleu_calc(lower_h1, lower_ref)
         b_h2 = bleu_calc(lower_h2, lower_ref)
 
-        print(1 if b_h1 > b_h2 else # \begin{cases}
-               (0 if b_h1 == b_h2
+        sum_h1 = l_h1 + b_h1
+        sum_h2 = l_h2 + b_h2
+
+        print(1 if sum_h1 > sum_h2 else # \begin{cases}
+               (0 if sum_h1 == sum_h2
                    else -1))        # \end{cases}
 
 # convention to allow import of this file as a module

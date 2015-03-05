@@ -115,6 +115,9 @@ def main():
         l_h1 = meteor_calc(lower_h1, rset)
         l_h2 = meteor_calc(lower_h2, rset)
 
+        print l_h1
+        print l_h2
+
         print(1 if l_h1 > l_h2 else # \begin{cases}
                (0 if l_h1 == l_h2
                    else -1))        # \end{cases}
