@@ -5,9 +5,9 @@ from itertools import islice # slicing for iterators
 
 
 # initializing tunable variables
-a = 0.0
-b = 1.0
-l = 1.0
+a = .55
+b = .9
+l = .05
 
 # creating a length function for iterators
 def len_iterable(i):
