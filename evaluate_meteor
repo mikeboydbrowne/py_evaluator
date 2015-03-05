@@ -77,13 +77,6 @@ def meteor_calc(h, ref):
     else:
         return (penalty(h, ref) * ((precision(h, ref) * recall(h, ref)) / ((1.0 - a) * (precision(h, ref) + recall(h, ref)))))
 
-# def match_set(h, ref):
-#     ret_set = []
-#     for w in h:
-#         if w in ref:
-#             ret_set.add(w)
-#     return ret_set
-
 # calculates the number of word matches between the reference and translation
 def word_matches(h, ref):
     return sum(1 for w in h if w in ref)
@@ -106,6 +99,7 @@ def main():
     # note: the -n option does not work in the original code
     for h1, h2, ref in islice(sentences(), opts.num_sentences):
 
+        # setting sentences to lower case
         lower_h1    = []
         lower_h2    = []
         lower_ref   = []
@@ -118,12 +112,13 @@ def main():
 
         rset = set(lower_ref)
 
+        # calculating meteor values
         l_h1 = meteor_calc(lower_h1, rset)
         l_h2 = meteor_calc(lower_h2, rset)
 
         print(1 if l_h1 > l_h2 else # \begin{cases}
                (0 if l_h1 == l_h2
-                   else -1))       # \end{cases}
+                   else -1))        # \end{cases}
 
 # convention to allow import of this file as a module
 if __name__ == '__main__':
