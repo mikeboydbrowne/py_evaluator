@@ -11,37 +11,17 @@ def ngram_calc(h, ref, val):
     num_matches         = 0.0
     num_matches_inter   = 0
 
-    # h_list   = list(h)
-    # ref_list = list(ref)
-
-    # print h
-    # print ref
-    # print num_grams
-
-    for i in range(0, num_grams, + 1):
-        # for j in range(1, val, + 1):
-        # print "is -" + str(ref[i:i + val]) + "- in hypothesis?"
+    for i in range(0, num_grams):
         if ngram_in(ref[i:i + val], h) == 1:
             num_matches = num_matches + 1
-        #     print 'yes'
-        # else:
-        #     print 'no'
-
-    # print str(val) + '-gram precision = ' + str(num_matches / num_grams)
-
     return num_matches / num_grams
 
 def ngram_in(ref, h):
-    # print 'checking: ' + str(h)
-    # print 'checking: ' + str(ref)
     num_grams  = len(h) - len(ref) + 1
     for i in range(0, num_grams, + 1):
         if ref == h[i: i + len(ref)]:
             return 1
     return 0
-
-
-
 def bleu_calc(h, ref):
 
     # calculating brevity penalty
@@ -49,32 +29,15 @@ def bleu_calc(h, ref):
 
     # calculating the precisions of all n-gram translations
     precisions = []
-    range_val = 0
-    if len(h) < 6:
-        range_val = len(h)
-    else:
-        range_val = 6
-
-    for i in range(1, range_val, + 1):
+    for i in range(1, len(ref)):
         precisions.append(ngram_calc(h, ref, i))
 
-    weight = 1.0 / len(precisions)
-    # print precisions
-
+    # calculating the bleu score
     ret_val = 0.0
     for p in precisions:
         if p > 0.0:
-            ret_val = ret_val + weight * math.log(p)
-
-    print ret_val
-    # print bp
-    # print math.fabs(bp * ret_val)
-
-    ret_val = pow(math.e, ret_val)
-
-    print ret_val
-
-    return math.fabs(bp * ret_val)
+            ret_val = ret_val + p
+    return bp * ret_val
 
 def brevity_penalty(h, ref):
     ret_val = 0.0
@@ -106,7 +69,7 @@ def main():
         lower_h1    = []
         lower_h2    = []
         lower_ref   = []
-        rset        = set()
+        # rset        = set()
         for w in h1:
             lower_h1.append(w.lower())
         for s in h2:

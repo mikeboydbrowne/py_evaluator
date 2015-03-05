@@ -18,7 +18,7 @@ def ngram_calc(h, ref, val):
     # print ref
     # print num_grams
 
-    for i in range(0, num_grams, + 1):
+    for i in range(0, num_grams):
         # for j in range(1, val, + 1):
         # print "is -" + str(ref[i:i + val]) + "- in hypothesis?"
         if ngram_in(ref[i:i + val], h) == 1:
@@ -40,6 +40,8 @@ def ngram_in(ref, h):
             return 1
     return 0
 
+
+
 def bleu_calc(h, ref):
 
     # calculating brevity penalty
@@ -47,22 +49,25 @@ def bleu_calc(h, ref):
 
     # calculating the precisions of all n-gram translations
     precisions = []
-    weight = 1.0 / len(ref)
-    for i in range(1, len(ref) + 1, + 1):
+
+    for i in range(1, len(ref)):
         precisions.append(ngram_calc(h, ref, i))
 
+    weight = 1.0 / len(ref)
     # print precisions
 
     ret_val = 0.0
     for p in precisions:
         if p > 0.0:
-            ret_val = ret_val + weight * math.log(p)
+            ret_val = ret_val + p
 
     # print ret_val
     # print bp
     # print math.fabs(bp * ret_val)
 
-    return math.fabs(bp * ret_val)
+    # print ret_val
+
+    return bp * ret_val
 
 def brevity_penalty(h, ref):
     ret_val = 0.0
@@ -73,6 +78,15 @@ def brevity_penalty(h, ref):
     return ret_val
 
 #### METEOR CODE
+
+# BEST METEOR VALUES
+# a = .55
+# b = .9
+# l = .05
+
+# a = .4
+# b = .7
+# l = .1
 
 # initializing tunable variables
 a = .55
