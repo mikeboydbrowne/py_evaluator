@@ -3,7 +3,6 @@ from __future__ import division
 import argparse # optparse is deprecated
 from itertools import islice # slicing for iterators
 
-
 # initializing tunable variables
 a = .55
 b = .9
