@@ -2,6 +2,24 @@
 import argparse # optparse is deprecated
 from itertools import islice # slicing for iterators
 
+
+# initializing tunable variables
+a = 1.0
+b = 1.0
+l = 1.0
+
+# creating a length function for iterators
+def len_iterable(i):
+    return sum(1 for _ in i)
+
+# calculate precision
+def precision(h, ref):
+    return (sum(1 for w in h if w in ref) / len_iterable(h))
+
+# calculate recall
+def recall(h, ref):
+    return (sum(1 for w in h if w in ref) / len_iterable(ref))
+
 # calculates the METEOR value of the reference and translation
 def meteor_calc(h, ref):
     return sum(1 for w in h if w in ref)
@@ -27,12 +45,6 @@ def main():
 
     # note: the -n option does not work in the original code
     for h1, h2, ref in islice(sentences(), opts.num_sentences):
-
-        # initializing tunable variables
-        a = 1.0
-        b = 1.0
-        l = 1.0
-
         # calculating METEOR values
         rset = set(ref)
         l_h1 = meteor_calc(h1, rset)
