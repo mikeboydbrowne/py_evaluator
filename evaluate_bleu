@@ -3,9 +3,6 @@ import argparse # optparse is deprecated
 import math
 from itertools import islice # slicing for iterators
 
-def word_matches(h, ref):
-    return sum(1 for w in h if w in ref)
-
 def ngram_calc(h, ref, val):
     num_grams           = len(ref) - val + 1
     num_matches         = 0.0

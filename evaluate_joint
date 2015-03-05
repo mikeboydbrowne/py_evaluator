@@ -6,42 +6,26 @@ from itertools import islice # slicing for iterators
 
 #### BLEU CODE
 
+# calculates the n-gram score for the sentence
 def ngram_calc(h, ref, val):
     num_grams           = len(ref) - val + 1
     num_matches         = 0.0
     num_matches_inter   = 0
 
-    # h_list   = list(h)
-    # ref_list = list(ref)
-
-    # print h
-    # print ref
-    # print num_grams
-
     for i in range(0, num_grams):
-        # for j in range(1, val, + 1):
-        # print "is -" + str(ref[i:i + val]) + "- in hypothesis?"
         if ngram_in(ref[i:i + val], h) == 1:
             num_matches = num_matches + 1
-        #     print 'yes'
-        # else:
-        #     print 'no'
-
-    # print str(val) + '-gram precision = ' + str(num_matches / num_grams)
-
     return num_matches / num_grams
 
+# returns whether or not the n-gram is in the sentence
 def ngram_in(ref, h):
-    # print 'checking: ' + str(h)
-    # print 'checking: ' + str(ref)
     num_grams  = len(h) - len(ref) + 1
     for i in range(0, num_grams, + 1):
         if ref == h[i: i + len(ref)]:
             return 1
     return 0
 
-
-
+# calculates the BLEU score
 def bleu_calc(h, ref):
 
     # calculating brevity penalty
@@ -49,26 +33,17 @@ def bleu_calc(h, ref):
 
     # calculating the precisions of all n-gram translations
     precisions = []
-
     for i in range(1, len(ref)):
         precisions.append(ngram_calc(h, ref, i))
 
-    weight = 1.0 / len(ref)
-    # print precisions
-
+    # calculating the bleu score
     ret_val = 0.0
     for p in precisions:
         if p > 0.0:
             ret_val = ret_val + p
-
-    # print ret_val
-    # print bp
-    # print math.fabs(bp * ret_val)
-
-    # print ret_val
-
     return bp * ret_val
 
+# calculates the brevity penalty
 def brevity_penalty(h, ref):
     ret_val = 0.0
     if len(h) < len(ref):
@@ -78,15 +53,6 @@ def brevity_penalty(h, ref):
     return ret_val
 
 #### METEOR CODE
-
-# BEST METEOR VALUES
-# a = .55
-# b = .9
-# l = .05
-
-# a = .4
-# b = .7
-# l = .1
 
 # initializing tunable variables
 a = .55
@@ -120,6 +86,7 @@ def penalty (h, ref):
     else:
         return 0.0
 
+# calculates the number of chunks in the sentence
 def chunks (h, ref):
     # initializing variables
     num_chunks      = 0.0
@@ -193,7 +160,6 @@ def main():
             lower_h2.append(s.lower())
         for t in ref:
             lower_ref.append(t.lower())
-
         rset = set(lower_ref)
 
         # calculating meteor values
@@ -204,12 +170,13 @@ def main():
         b_h1 = bleu_calc(lower_h1, lower_ref)
         b_h2 = bleu_calc(lower_h2, lower_ref)
 
+        # summing the values together
         sum_h1 = l_h1 + b_h1
         sum_h2 = l_h2 + b_h2
 
         print(1 if sum_h1 > sum_h2 else # \begin{cases}
                (0 if sum_h1 == sum_h2
-                   else -1))        # \end{cases}
+                   else -1))            # \end{cases}
 
 # convention to allow import of this file as a module
 if __name__ == '__main__':
