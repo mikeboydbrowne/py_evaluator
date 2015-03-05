@@ -22,9 +22,6 @@ def precision(h, ref):
 
 # calculate recall
 def recall(h, ref):
-    # print "length of ref: " + str(len(ref))
-    # print "num matches:   " + str(word_matches(h, ref))
-    # print "recall value:  " + str((word_matches(h, ref) / len(ref)))
     if word_matches(h, ref) != 0:
         return (word_matches(h, ref) / len(ref))
     else:
@@ -75,21 +72,17 @@ def chunks (h, ref):
 
 # calculates the METEOR value of the reference and translation
 def meteor_calc(h, ref):
-    # print "penalty: " + str(penalty(h, ref))
-    # print "recall:  " + str(recall(h, ref))
-    # print "chunks:  " + str(chunks(h, ref))
     if recall(h, ref) == penalty(h, ref) == 0.0:
         return 0.0
     else:
         return (penalty(h, ref) * ((precision(h, ref) * recall(h, ref)) / ((1.0 - a) * (precision(h, ref) + recall(h, ref)))))
 
-def match_set(h, ref):
-    ret_set = []
-    for w in h:
-        if w in ref:
-            ret_set.add(w)
-    return ret_set
-
+# def match_set(h, ref):
+#     ret_set = []
+#     for w in h:
+#         if w in ref:
+#             ret_set.add(w)
+#     return ret_set
 
 # calculates the number of word matches between the reference and translation
 def word_matches(h, ref):
@@ -113,24 +106,24 @@ def main():
     # note: the -n option does not work in the original code
     for h1, h2, ref in islice(sentences(), opts.num_sentences):
 
-        rset = set(ref)
+        lower_h1    = []
+        lower_h2    = []
+        lower_ref   = []
+        for w in h1:
+            lower_h1.append(w.lower())
+        for s in h2:
+            lower_h2.append(s.lower())
+        for t in ref:
+            lower_ref.append(t.lower())
 
-        # calculating METEOR values
-        if (word_matches(h1, rset)) == 0:
-            print "h1:  " + str(h1)
-            print "ref: " + str(ref)
+        rset = set(lower_ref)
 
-        if  word_matches(h2, rset) == 0:
-            print "h2:  " + str(h2)
-            print "ref: " + str(ref)
+        l_h1 = meteor_calc(lower_h1, rset)
+        l_h2 = meteor_calc(lower_h2, rset)
 
-        rset = set(ref)
-        l_h1 = meteor_calc(h1, rset)
-        l_h2 = meteor_calc(h2, rset)
-
-        # print(1 if l_h1 > l_h2 else # \begin{cases}
-        #        (0 if l_h1 == l_h2
-        #            else -1))       # \end{cases}
+        print(1 if l_h1 > l_h2 else # \begin{cases}
+               (0 if l_h1 == l_h2
+                   else -1))       # \end{cases}
 
 # convention to allow import of this file as a module
 if __name__ == '__main__':
